@@ -1,0 +1,27 @@
+services:
+  shot-capturer:
+    image: linuxserver/ffmpeg
+    volumes:
+      - ./output:/config
+    devices:
+      - /dev/video0:/dev/video0
+    command: ["-i", "/dev/video0", "-ss", "00:00:05", "-vframes:", "1", "/config/output.jpg"]
+  object-detection:
+    build: ./object-detection
+    depends_on:
+      shot-capturer:
+        condition: service_completed_successfully
+    volumes:
+      - ./output:/home/app/output
+    command: ["python", "detect.py", "output/output.jpg"]
+  shot-uploader:
+    build: ./shot-uploader
+    depends_on:
+      object-detection:
+        condition: service_completed_successfully
+    volumes:
+      - ./output:/home/app/output
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+    command: ["python", "upload.py", "-of", "output/output.jpg", "-df", "output/output_detect.jpg"]
