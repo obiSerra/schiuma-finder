@@ -28,10 +28,10 @@ if __name__ == "__main__":
     # Results
     objects = [v[-1] for v in results.pandas().xyxy[0].values.tolist()]
     if "cat" in objects:
-        print("Schiuma trovato!!!")
+        print("Schiuma trovato! - 1")
     else:
-        print("Schiuma non c'è!!!")
+        print("Schiuma non c'è! - 1")
 
-    results.save()
+    results.save(save_dir="runs/detect/exp")
 
     shutil.move("/home/app/runs/detect/exp/output.jpg", "/home/app/output/output_detect.jpg")
